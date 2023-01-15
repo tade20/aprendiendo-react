@@ -7,19 +7,23 @@ export function App() {
         <TwitterFollowCard formatUserName={formatUserName} 
         userName="tadeomachin" 
         name="Tadeo Machin" 
-        imageUrl="kikobeats"/>
+        imageUrl="kikobeats"
+        isFollowing={true}/>
         <TwitterFollowCard formatUserName={formatUserName}
          userName="fedesil" 
          name="Federica Silvera" 
-         imageUrl="fedesil"/>
+         imageUrl="fedesil"
+         isFollowing={false}/>
         <TwitterFollowCard formatUserName={formatUserName}
          userName="billGa" 
          name="Bill Gates" 
-         imageUrl="billgates"/>
+         imageUrl="billgates"
+         isFollowing={false}/>
         <TwitterFollowCard formatUserName={formatUserName}
          userName="elon" 
          name="Elon Musk" 
-         imageUrl="elonmusk"/>
+         imageUrl="elonmusk"
+         isFollowing={true}/>
         </section>
     )
 }
