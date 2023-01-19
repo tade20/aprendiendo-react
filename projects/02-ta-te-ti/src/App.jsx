@@ -7,9 +7,14 @@ function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [turn, setTurn] = useState(TURNS.x);
   const updateBoard = (index) => {
+    // No actualizar la posicion
+    //si ya contiene un elemento dentro
+    if (board[index]) return;
+    //Actualiza el tablero cuando se da click
     const newBoard = [...board];
     newBoard[index] = turn;
     setBoard(newBoard);
+    // cambia el turno entre 'x' y 'o'
     const newTurn = turn === TURNS.x ? TURNS.o : TURNS.x;
     setTurn(newTurn);
   };
