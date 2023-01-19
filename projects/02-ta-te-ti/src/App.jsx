@@ -1,15 +1,33 @@
 import "./App.css";
-import { TURNS } from "./constants";
+import { TURNS, WINNER_COMBOS } from "./constants";
 import { Square } from "./components/Square";
 import { useState } from "react";
 
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [turn, setTurn] = useState(TURNS.x);
+  // null no hay ganador, false hay un empate
+  const [winner, setWinner] = useState(null);
+  //Funcion para revisar todas las convinaciones ganadoras
+  //y retorna el ganador
+  const checkWinner = (boardToCheck) => {
+    for (const combo of WINNER_COMBOS) {
+      const [a, b, c] = combo;
+      if (
+        boardToCheck[a] &&
+        boardToCheck[a] === boardToCheck[b] &&
+        boardToCheck[a] === boardToCheck[c]
+      ) {
+        return boardToCheck[a];
+      }
+    }
+    //Si no hay ganador retorna null
+    return null;
+  };
   const updateBoard = (index) => {
     // No actualizar la posicion
     //si ya contiene un elemento dentro
-    if (board[index]) return;
+    if (board[index] || winner) return;
     //Actualiza el tablero cuando se da click
     const newBoard = [...board];
     newBoard[index] = turn;
@@ -17,6 +35,11 @@ function App() {
     // cambia el turno entre 'x' y 'o'
     const newTurn = turn === TURNS.x ? TURNS.o : TURNS.x;
     setTurn(newTurn);
+    //Aca se revis si hay un nuevo ganador
+    const newWinner = checkWinner(newBoard);
+    if (newWinner) {
+      setWinner(newWinner);
+    }
   };
   return (
     <main className="board">
