@@ -2,6 +2,7 @@ import "./App.css";
 import { TURNS, WINNER_COMBOS } from "./constants";
 import { Square } from "./components/Square";
 import { useState } from "react";
+import confetti from "canvas-confetti";
 
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
@@ -24,6 +25,12 @@ function App() {
     //Si no hay ganador retorna null
     return null;
   };
+
+  const checkEndGame = (newBoard) => {
+    // revisa si hay un empate, si no hay mas espacios para llenar
+    return newBoard.every((square) => square !== null);
+  };
+
   const updateBoard = (index) => {
     // No actualizar la posicion
     //si ya contiene un elemento dentro
@@ -38,9 +45,20 @@ function App() {
     //Aca se revis si hay un nuevo ganador
     const newWinner = checkWinner(newBoard);
     if (newWinner) {
+      confetti();
       setWinner(newWinner);
+    } else if (checkEndGame(newBoard)) {
+      // verifica si hay un empate
+      setWinner(false);
     }
   };
+
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setTurn(TURNS.x);
+    setWinner(null);
+  };
+
   return (
     <main className="board">
       <h1>Ta te ti</h1>
@@ -53,10 +71,24 @@ function App() {
           );
         })}
       </section>
+      <button onClick={resetGame}>Reset</button>
       <section className="turn">
         <Square isSelected={turn === TURNS.x}>{TURNS.x}</Square>
         <Square isSelected={turn === TURNS.o}>{TURNS.o}</Square>
       </section>
+      {winner !== null && (
+        <section className="winner">
+          <div className="text">
+            <h2>{winner == false ? "empate" : "Ha ganado " + winner}</h2>
+            <header className="win">
+              {winner && <Square>{winner}</Square>}
+            </header>
+            <footer>
+              <button onClick={resetGame}>Jugar de nuevo</button>
+            </footer>
+          </div>
+        </section>
+      )}
     </main>
   );
 }
