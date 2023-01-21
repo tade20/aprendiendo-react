@@ -1,35 +1,25 @@
 import "./App.css";
-import { TURNS, WINNER_COMBOS } from "./constants";
+import { TURNS } from "./constants";
 import { Square } from "./components/Square";
 import { useState } from "react";
 import confetti from "canvas-confetti";
-
+import { checkWinner, checkEndGame } from "./logic/board";
+import { WinnerModal } from "./components/WinnerModal";
 function App() {
-  const [board, setBoard] = useState(Array(9).fill(null));
-  const [turn, setTurn] = useState(TURNS.x);
+  const [board, setBoard] = useState(() => {
+    const boardLocalStorage = window.localStorage.getItem("board");
+    return boardLocalStorage
+      ? JSON.parse(boardLocalStorage)
+      : Array(9).fill(null);
+  });
+  const [turn, setTurn] = useState(() => {
+    const turnLocalStorage = window.localStorage.getItem("turn");
+    return turnLocalStorage ? turnLocalStorage : TURNS.x;
+  });
   // null no hay ganador, false hay un empate
   const [winner, setWinner] = useState(null);
   //Funcion para revisar todas las convinaciones ganadoras
   //y retorna el ganador
-  const checkWinner = (boardToCheck) => {
-    for (const combo of WINNER_COMBOS) {
-      const [a, b, c] = combo;
-      if (
-        boardToCheck[a] &&
-        boardToCheck[a] === boardToCheck[b] &&
-        boardToCheck[a] === boardToCheck[c]
-      ) {
-        return boardToCheck[a];
-      }
-    }
-    //Si no hay ganador retorna null
-    return null;
-  };
-
-  const checkEndGame = (newBoard) => {
-    // revisa si hay un empate, si no hay mas espacios para llenar
-    return newBoard.every((square) => square !== null);
-  };
 
   const updateBoard = (index) => {
     // No actualizar la posicion
@@ -42,7 +32,10 @@ function App() {
     // cambia el turno entre 'x' y 'o'
     const newTurn = turn === TURNS.x ? TURNS.o : TURNS.x;
     setTurn(newTurn);
-    //Aca se revis si hay un nuevo ganador
+    // Guardar la partida para poder seguir jugando donde se quedo
+    window.localStorage.setItem("board", JSON.stringify(newBoard));
+    window.localStorage.setItem("turn", newTurn);
+    //Aca se revisa si hay un nuevo ganador
     const newWinner = checkWinner(newBoard);
     if (newWinner) {
       confetti();
@@ -57,6 +50,9 @@ function App() {
     setBoard(Array(9).fill(null));
     setTurn(TURNS.x);
     setWinner(null);
+
+    window.localStorage.removeItem("board");
+    window.localStorage.removeItem("turn");
   };
 
   return (
@@ -76,19 +72,7 @@ function App() {
         <Square isSelected={turn === TURNS.x}>{TURNS.x}</Square>
         <Square isSelected={turn === TURNS.o}>{TURNS.o}</Square>
       </section>
-      {winner !== null && (
-        <section className="winner">
-          <div className="text">
-            <h2>{winner == false ? "empate" : "Ha ganado " + winner}</h2>
-            <header className="win">
-              {winner && <Square>{winner}</Square>}
-            </header>
-            <footer>
-              <button onClick={resetGame}>Jugar de nuevo</button>
-            </footer>
-          </div>
-        </section>
-      )}
+      <WinnerModal winner={winner} resetGame={resetGame} />
     </main>
   );
 }
